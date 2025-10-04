@@ -1,0 +1,40 @@
+{
+    "id": "dynamic-actor-intros",
+    "title": "Dynamic Actor Intros",
+    "description": "Adds Yakuza-style dynamic intros for actors in FoundryVTT.",
+    "version": "1.0.0",
+    "compatibility": {
+        "minimum": "12",
+        "verified": "12",
+        "maximum": "12"
+    },
+    "authors": [
+        {
+            "name": "CodingSheep",
+            "flags": {}
+        }
+    ],
+    "socket": true,
+    "relationships": {
+        "requires": [
+            {
+                "id": "socketlib",
+                "type": "module",
+                "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/master/module.json",
+                "compatibility": {}
+            }
+        ]
+    },
+    "esmodules": [
+        "scripts/dynamic-intros-init.js"
+    ],
+    "styles": [
+        "styles/dynamic-intros.css"
+    ],
+    "fonts": [
+        {
+            "name": "EDO SZ",
+            "path": "fonts/EDO-SZ.ttf"
+        }
+    ]
+}

@@ -1,0 +1,95 @@
+@font-face {
+    font-family: 'EDO SZ';
+    src: url('../fonts/edosz.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.dynamic-intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    cursor: pointer;
+}
+
+.dynamic-image-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.dynamic-intro-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    /* Default, will be overridden by JS */
+    transition: filter 1s ease, transform 0.3s ease;
+    /* Smooth transitions */
+    border: none;
+}
+
+.dynamic-intro-filtered {
+    filter: grayscale(1) sepia(0.2);
+}
+
+.dynamic-intro-text-wrapper {
+    position: absolute;
+    bottom: 8vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Adjust for portrait mode */
+@media (orientation: portrait) {
+    .dynamic-intro-text-wrapper {
+        bottom: 3vh;
+    }
+}
+
+.dynamic-intro-text {
+    font-family: 'EDO SZ', sans-serif;
+    color: #ad0a0a;
+    text-shadow: 2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block;
+    opacity: 0;
+    /* Hidden until fade-in */
+    transform: translateY(10px);
+}
+
+.dynamic-title {
+    font-size: 6rem;
+    margin-bottom: 10px;
+}
+
+.dynamic-subtitle {
+    font-size: 2.5rem;
+    margin: 5px 0;
+}
+
+/* Fade-in effect */
+.dynamic-intro-text.show {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 500ms, transform 500ms;
+}
