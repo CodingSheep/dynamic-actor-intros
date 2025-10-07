@@ -3,7 +3,7 @@
  * Main functionality and API integration
  */
 
-import { DAI_ID } from './dynamic-intros-utils.js';
+import { DAI_ID, AVAILABLE_FONTS, getAvailableFonts } from './dynamic-intros-utils.js';
 import { logInfo, logDebug, logError, logWarning } from './dynamic-intros-logging.js';
 import { showDynamicIntro } from './dynamic-intros-ui.js';
 import { registerSettings } from './dynamic-intros-settings.js';
@@ -42,7 +42,8 @@ export async function init() {
     // Create global API access
     logDebug("Exposing global API");
     window.DynamicActorIntros = {
-        triggerActorIntro
+        triggerActorIntro,
+        socket
     };
 
     // Expose API
@@ -51,6 +52,26 @@ export async function init() {
         triggerActorIntro
     };
     logDebug("Core module initialization complete");
+
+    // Inject Fonts
+    injectFonts();
+    logInfo("Fonts Injected");
+}
+
+/**
+ * Handle font injection
+ */
+
+export async function injectFonts() {
+    if (!AVAILABLE_FONTS.length) await getAvailableFonts();
+
+    for (const f of AVAILABLE_FONTS) {
+        const font = new FontFace(f.name, `url(${f.path})`);
+        await font.load();        // Wait for font to load
+        document.fonts.add(font); // Make it available globally
+        logDebug(`Loaded font: ${f.name}`);
+    }
+    logInfo("All fonts loaded and ready for use.");
 }
 
 /**
@@ -67,7 +88,7 @@ async function handleShowDynamicIntro(actorData) {
  * Trigger an intro with the actor
  * @param {Object} actor - Actor to extract data for the intro
  */
-export function triggerActorIntro(actor) {
+export async function triggerActorIntro(actor) {
     if (!game.user.isGM) {
         ui.notifications.warn("Only the GM can trigger dynamic intros.");
         return;
@@ -76,13 +97,19 @@ export function triggerActorIntro(actor) {
     const actorData = {
         name: actor.name,
         img: actor.img,
+        font: "",
         title: actor.name,
         subtitle1: "",
         subtitle2: ""
     };
 
+    const fontOptions = (AVAILABLE_FONTS.length
+        ? AVAILABLE_FONTS.map(f => `<option value="${f.name}" ${f.name === actorData.font ? "selected" : ""}>${f.name}</option>`)
+        : [`<option value="EDO SZ" selected>EDO SZ</option>`]
+    ).join("");
+
     // Open a Dialog for GM to edit title/subtitles
-    new Dialog({
+    const introBox = new Dialog({
         title: `Dynamic Intro for ${actor.name}`,
         content: `
             <form>
@@ -92,28 +119,85 @@ export function triggerActorIntro(actor) {
                 </div>
                 <div class="form-group">
                     <label>Subtitle 1</label>
-                    <input type="text" name="subtitle1" value="">
+                    <input type="text" name="subtitle1" value="${actorData.subtitle1}">
                 </div>
                 <div class="form-group">
                     <label>Subtitle 2</label>
-                    <input type="text" name="subtitle2" value="">
+                    <input type="text" name="subtitle2" value="${actorData.subtitle2}">
+                </div>
+                <div class="form-group">
+                    <label>Font Style:</label>
+                    <select name="font">
+                        ${fontOptions}
+                    </select>
                 </div>
             </form>
         `,
         buttons: {
-            ok: {
+            save: {
                 icon: '<i class="fas fa-check"></i>',
-                label: "Show Intro",
+                label: "Save as Macro",
                 callback: html => {
                     // Collect the inputs
                     actorData.title = html.find('[name="title"]').val();
                     actorData.subtitle1 = html.find('[name="subtitle1"]').val();
                     actorData.subtitle2 = html.find('[name="subtitle2"]').val();
+                    actorData.font = html.find('[name="font"]').val();
 
-                    // Broadcast to all clients
-                    logInfo("Executing showIntro for all users");
-                    socket.executeForEveryone("showDynamicIntro", actorData);
-                    logInfo("Intro triggered for all users");
+                    // Build the Macro Command String
+                    const macroCommand = `
+                        window.DynamicActorIntros.socket.executeForEveryone(
+                            "showDynamicIntro",
+                            {
+                                name: "${actorData.name.replace(/"/g, '\\"')}",
+                                img: "${actorData.img.replace(/"/g, '\\"')}",
+                                font: "${actorData.font.replace(/"/g, '\\"')}",
+                                title: "${actorData.title.replace(/"/g, '\\"')}",
+                                subtitle1: "${actorData.subtitle1.replace(/"/g, '\\"')}",
+                                subtitle2: "${actorData.subtitle2.replace(/"/g, '\\"')}"
+                            }
+                        );
+        	        `;
+                    const macroName = `Dynamic Intro: ${actorData.name}`;
+
+                    // Check of macro already exists
+                    const existingMacro = game.macros.find(m => m.name === macroName);
+
+                    if (existingMacro) {
+                        // Update the macro command
+                        existingMacro.update({ command: macroCommand }).then(() => logInfo("Macro Updated."));
+                        ui.notifications.info(`Macro "${macroName}" updated and stored in your Macro Directory!`);
+                    } else {
+                        // Create a new macro
+                        const macroData = {
+                            name: macroName,
+                            type: "script",
+                            scope: "global",
+                            command: macroCommand,
+                            img: actorData.img || "icons/svg/dice-target.svg"
+                        };
+                        Macro.create(macroData, { displaySheet: true }).then(() => logInfo("Macro Created."));
+                        ui.notifications.info(`Macro "${macroName}" created and stored in your Macro Directory!`);
+                    }
+                }
+            },
+            test: {
+                icon: '<i class="fas fa-eye"></i>',
+                label: "Test Intro",
+                callback: html => {
+                    // Collect the inputs
+                    actorData.title = html.find('[name="title"]').val();
+                    actorData.subtitle1 = html.find('[name="subtitle1"]').val();
+                    actorData.subtitle2 = html.find('[name="subtitle2"]').val();
+                    actorData.font = html.find('[name="font"]').val();
+
+                    // Broadcast to just the GM client.
+                    showDynamicIntro(actorData)
+                        .then(() => { logInfo("Intro triggered for GM user") })
+                        .catch(err => logWarning(err));
+
+                    // Re-render the dialog box
+                    introBox.render(true);
                 }
             },
             cancel: {
@@ -121,6 +205,7 @@ export function triggerActorIntro(actor) {
                 label: "Cancel"
             }
         },
-        default: "ok"
-    }).render(true);
+        default: "save"
+    })
+    introBox.render(true);
 }

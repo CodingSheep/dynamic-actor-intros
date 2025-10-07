@@ -3,7 +3,6 @@
  */
 
 import { init } from './dynamic-intros-core.js';
-// import { registerKeybindings } from './yakuza-settings.js';
 import { logInfo, logDebug, logError, logWarning } from './dynamic-intros-logging.js';
 
 // Module initialization state
@@ -19,8 +18,8 @@ Hooks.once("init", () => {
     // Set up context menu hooks early
     setupActorContextMenu();
     logInfo("Actor Context Menu Added.");
-    setupTokenContextMenu();
-    logInfo("Token Context Menu Added.");
+    //setupTokenContextMenu();
+    //logInfo("Token Context Menu Added.");
 });
 
 // Register keybindings during setup

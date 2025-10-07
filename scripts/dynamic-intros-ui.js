@@ -9,14 +9,15 @@ import { DAI_ID } from './dynamic-intros-utils.js';
 /**
  * Build the text elements for the intro overlay
  * @param {string} title - The main title
+ * @param {string} font - The font to be used
  * @param {string} subtitle1 - The first subtitle
  * @param {string} subtitle2 - The second subtitle
  * @returns {string} HTML string for the text elements
  */
-export function buildTextElements(title, subtitle1 = null, subtitle2 = null) {
-    logDebug(`Building text elements: title="${title}", subtitle1="${subtitle1}", subtitle2="${subtitle2}"`);
+function buildTextElements(title, font, subtitle1 = null, subtitle2 = null) {
+    logDebug(`Building text elements: title="${title}", font="${font}", subtitle1="${subtitle1}", subtitle2="${subtitle2}"`);
     return `
-        <div class="dynamic-intro-text-wrapper">
+        <div class="dynamic-intro-text-wrapper" style="font-family: '${font}', sans-serif;">
             <div class="dynamic-intro-text dynamic-title">${title}</div>
             ${subtitle1 ? `<div class="dynamic-intro-text dynamic-subtitle">${subtitle1}</div>` : ''}
             ${subtitle2 ? `<div class="dynamic-intro-text dynamic-subtitle">${subtitle2}</div>` : ''}
@@ -28,7 +29,7 @@ export function buildTextElements(title, subtitle1 = null, subtitle2 = null) {
  * Animate the intro elements
  * @returns {Promise<void>} Promise that resolves when animation is complete
  */
-export async function animateElements() {
+async function animateElements() {
     logDebug("Starting animation sequence");
     let skip = false;
     const overlay = $("#dynamic-intro-overlay");
@@ -72,7 +73,7 @@ export async function showDynamicIntro(introData) {
             <div class="dynamic-image-container">
                 <img src="${introData.img}" class="dynamic-intro-image" style="visibility: hidden;">
             </div>
-            ${buildTextElements(introData.title, introData.subtitle1, introData.subtitle2)}
+            ${buildTextElements(introData.title, introData.font, introData.subtitle1, introData.subtitle2)}
         </div>
     `);
 
@@ -88,7 +89,7 @@ export async function showDynamicIntro(introData) {
     await animateElements();
 
     // Auto-fade after a time defined in the module settings
-    
+
     const fadeOutSeconds = game.settings.get(DAI_ID, "fadeOutSeconds") || 5;
     const fadeOutMs = fadeOutSeconds * 1000;
 

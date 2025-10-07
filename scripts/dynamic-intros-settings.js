@@ -24,8 +24,8 @@ export function registerFadeOutTimer() {
         type: Number,
         default: 5,
         range: {
-            min: 3,
-            max: 5,
+            min: 2,
+            max: 8,
             step: 1
         },
         onChange: value => {
