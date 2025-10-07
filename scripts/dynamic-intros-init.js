@@ -6,7 +6,6 @@ import { init } from './dynamic-intros-core.js';
 import { logInfo, logDebug, logError, logWarning } from './dynamic-intros-logging.js';
 
 // Module initialization state
-// let i18nInitialized = false;
 let moduleInitialized = false;
 
 logInfo("Entry module loaded");
@@ -18,10 +17,13 @@ Hooks.once("init", () => {
     // Set up context menu hooks early
     setupActorContextMenu();
     logInfo("Actor Context Menu Added.");
+
+    // I'm keeping this here for the purpose of eventually adding this option to an existing token on the field.
     //setupTokenContextMenu();
     //logInfo("Token Context Menu Added.");
 });
 
+// Legacy from Yakuza-fy, but if I add keybindings, it'll be good to have this hook here.
 // Register keybindings during setup
 Hooks.once("setup", () => {
     logDebug("setup hook triggered");
@@ -32,7 +34,7 @@ Hooks.once("setup", () => {
 Hooks.once("ready", () => {
     logDebug("ready hook triggered");
 
-    // If i18n is already initialized, initialize the module now
+    // Legacy check from Yakuza-fy as that has Localization support. I'll keep it just in case I add support as well.
     if (!moduleInitialized) {
         initializeModule();
     }

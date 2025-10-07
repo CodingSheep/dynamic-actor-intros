@@ -12,15 +12,24 @@ import { DAI_ID } from './dynamic-intros-utils.js';
  * @param {string} font - The font to be used
  * @param {string} subtitle1 - The first subtitle
  * @param {string} subtitle2 - The second subtitle
+ * @param {string} textColor - The text color
+ * @param {string} textShadow - The text shadow color
  * @returns {string} HTML string for the text elements
  */
-function buildTextElements(title, font, subtitle1 = null, subtitle2 = null) {
-    logDebug(`Building text elements: title="${title}", font="${font}", subtitle1="${subtitle1}", subtitle2="${subtitle2}"`);
+function buildTextElements(title, font, subtitle1 = null, subtitle2 = null, textColor = "#ad0a0a", textShadow = "#ffffff") {
+
+    const shadow = `2px 2px 0 ${textShadow},
+		    -2px -2px 0 ${textShadow},
+		    2px -2px 0 ${textShadow},
+		    -2px 2px 0 ${textShadow}`;
+
+    logInfo(`Building text elements: title="${title}", font="${font}", subtitle1="${subtitle1}", subtitle2="${subtitle2}", textColor="${textColor}", textShadow="${textShadow}"`);
+
     return `
         <div class="dynamic-intro-text-wrapper" style="font-family: '${font}', sans-serif;">
-            <div class="dynamic-intro-text dynamic-title">${title}</div>
-            ${subtitle1 ? `<div class="dynamic-intro-text dynamic-subtitle">${subtitle1}</div>` : ''}
-            ${subtitle2 ? `<div class="dynamic-intro-text dynamic-subtitle">${subtitle2}</div>` : ''}
+            <div class="dynamic-intro-text dynamic-title" style="color: ${textColor}; text-shadow: ${shadow};">${title}</div>
+            ${subtitle1 ? `<div class="dynamic-intro-text dynamic-subtitle" style="color: ${textColor}; text-shadow: ${shadow};">${subtitle1}</div>` : ''}
+            ${subtitle2 ? `<div class="dynamic-intro-text dynamic-subtitle" style="color: ${textColor}; text-shadow: ${shadow};">${subtitle2}</div>` : ''}
         </div>
     `;
 }
@@ -58,13 +67,14 @@ async function animateElements() {
 
 /**
  * Show the intro overlay
- * @param {Object} actorData - Data for the intro (name, img)
- * @param {Function} onGMClick - Function to handle GM click events
+ * @param {Object} introData - Data for the intro (name, img, title, font, subtitle1, subtitle2, textColor, textShadow)
  * @returns {Promise<void>} Promise that resolves when intro is shown
  */
 export async function showDynamicIntro(introData) {
     logDebug("Showing dynamic intro with data:", introData);
     $("#dynamic-intro-overlay").remove();
+
+    logInfo(introData);
 
     // Create overlay DOM structure
     logDebug("Creating overlay DOM structure");
@@ -73,7 +83,9 @@ export async function showDynamicIntro(introData) {
             <div class="dynamic-image-container">
                 <img src="${introData.img}" class="dynamic-intro-image" style="visibility: hidden;">
             </div>
-            ${buildTextElements(introData.title, introData.font, introData.subtitle1, introData.subtitle2)}
+            ${buildTextElements(introData.title, introData.font,
+        introData.subtitle1, introData.subtitle2,
+        introData.textColor, introData.textShadow)}
         </div>
     `);
 
@@ -89,7 +101,6 @@ export async function showDynamicIntro(introData) {
     await animateElements();
 
     // Auto-fade after a time defined in the module settings
-
     const fadeOutSeconds = game.settings.get(DAI_ID, "fadeOutSeconds") || 5;
     const fadeOutMs = fadeOutSeconds * 1000;
 

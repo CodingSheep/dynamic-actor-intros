@@ -1,7 +1,7 @@
 {
     "id": "dynamic-actor-intros",
     "title": "Dynamic Actor Intros",
-    "description": "Adds Yakuza-style dynamic intros for actors in FoundryVTT.",
+    "description": "A Foundry VTT module that provides cinematic, customizable dynamic intros for actors.",
     "version": "1.0.0",
     "compatibility": {
         "minimum": "12",
@@ -31,10 +31,7 @@
     "styles": [
         "styles/dynamic-intros.css"
     ],
-    "fonts": [
-        {
-            "name": "EDO SZ",
-            "path": "fonts/EDO-SZ.ttf"
-        }
-    ]
+    "url": "https://github.com/codingsheep/dynamic-actor-intros",
+    "manifest": "https://raw.githubusercontent.com/CodingSheep/dynamic-actor-intros/main/module.json",
+    "download": "https://github.com/CodingSheep/dynamic-actor-intros/archive/refs/heads/main.zip"
 }
