@@ -2,7 +2,7 @@
     "id": "dynamic-actor-intros",
     "title": "Dynamic Actor Intros",
     "description": "A Foundry VTT module that provides cinematic, customizable dynamic intros for actors.",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "compatibility": {
         "minimum": "12",
         "verified": "12",

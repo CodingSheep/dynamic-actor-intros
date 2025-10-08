@@ -19,8 +19,8 @@ Hooks.once("init", () => {
     logInfo("Actor Context Menu Added.");
 
     // I'm keeping this here for the purpose of eventually adding this option to an existing token on the field.
-    //setupTokenContextMenu();
-    //logInfo("Token Context Menu Added.");
+    setupTokenContextMenu();
+    logInfo("Token Context Menu Added.");
 });
 
 // Legacy from Yakuza-fy, but if I add keybindings, it'll be good to have this hook here.
@@ -72,6 +72,40 @@ function setupActorContextMenu() {
         });
     });
 }
+
+function setupTokenContextMenu() {
+    logDebug("Setting up context menu for tokens.");
+
+    Hooks.on("getSceneControlButtons", controls => {
+        if (!game.user.isGM) return; // Only GMs can trigger intros
+
+	const tokenControls = controls.find(c => c.name === "token");
+	if (!tokenControls) return;
+
+        tokenControls.tools.push({
+	    name: "dynamicActorIntro",
+            title: "Dynamic Actor Intro",
+            icon: "fas fa-bomb",
+            button: true,
+            onClick: () => {
+                const selected = canvas.tokens.controlled[0];
+
+                if (!selected || !selected.actor) {
+                    return ui.notifications.warn("Select a token first.");
+                }
+
+		if (window.DynamicActorIntros?.triggerActorIntro) {
+                    window.DynamicActorIntros.triggerActorIntro(selected.actor);
+                } else {
+                    logError("DynamicActorIntros API not available");
+                    ui.notifications.error("Dynamic Actor Intros API not available.");
+                }
+            },
+	    visible: true
+        });
+    });
+}
+
 
 /**
  * Initialize the module after ready hook has fired

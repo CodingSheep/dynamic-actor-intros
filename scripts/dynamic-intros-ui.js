@@ -23,7 +23,7 @@ function buildTextElements(title, font, subtitle1 = null, subtitle2 = null, text
 		    2px -2px 0 ${textShadow},
 		    -2px 2px 0 ${textShadow}`;
 
-    logInfo(`Building text elements: title="${title}", font="${font}", subtitle1="${subtitle1}", subtitle2="${subtitle2}", textColor="${textColor}", textShadow="${textShadow}"`);
+    logDebug(`Building text elements: title="${title}", font="${font}", subtitle1="${subtitle1}", subtitle2="${subtitle2}", textColor="${textColor}", textShadow="${textShadow}"`);
 
     return `
         <div class="dynamic-intro-text-wrapper" style="font-family: '${font}', sans-serif;">
@@ -73,9 +73,6 @@ async function animateElements() {
 export async function showDynamicIntro(introData) {
     logDebug("Showing dynamic intro with data:", introData);
     $("#dynamic-intro-overlay").remove();
-
-    logInfo(introData);
-
     // Create overlay DOM structure
     logDebug("Creating overlay DOM structure");
     const overlay = $(`

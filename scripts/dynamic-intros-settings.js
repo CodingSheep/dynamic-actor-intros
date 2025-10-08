@@ -14,6 +14,7 @@ export function registerSettings() {
 
     registerFadeOutTimer();
     registerDefaultFontFamily();
+    registerUserFontDir();
     registerDefaultTextColor();
     registerDefaultShadowColor();
 
@@ -43,11 +44,26 @@ export function registerFadeOutTimer() {
     });
 }
 
+export function registerUserFontDir() {
+    game.settings.register(DAI_ID, "userFontDir", {
+        name: "User Font Folder",
+        hint: "Optional: Specify a user folder where additional fonts can be stored.",
+        scope: "world",
+        config: true,
+        type: String,
+        default: "",
+	filePicker: "folder",
+        onChange: async value => {
+	    logDebug(`User Font Folder updated to: ${value}`);
+            await getAvailableFonts();
+        }
+    });
+}
+
 /**
  * Register the Default Font to be used
  */
 export function registerDefaultFontFamily() {
-
     const fontOptions = {};
     for (const font of AVAILABLE_FONTS) {
         fontOptions[font.name] = font.name;
@@ -101,35 +117,6 @@ export function registerDefaultShadowColor() {
             logDebug(`Default text shadow color changed to ${value}`);
         },
     });
-}
-
-/**
- * This function handles refreshing all Font Choices when a new font is added/removed from the fonts folder
- */
-export function refreshDefaultFontChoices() {
-    const setting = game.settings.settings.get(`${DAI_ID}.defaultFontFamily`);
-    if (!setting) {
-        logInfo("Setting does not exist");
-        return;
-    }
-
-    const newChoices = {};
-    for (const font of AVAILABLE_FONTS) {
-        newChoices[font.name] = font.name;
-    }
-
-    // Replace the choices object
-    setting.choices = newChoices;
-
-    // Update the settings UI if it's open
-    const form = document.querySelector(`select[name="${DAI_ID}.defaultFontFamily"]`);
-    if (form) {
-        form.innerHTML = Object.entries(newChoices)
-            .map(([k, v]) => `<option value="${k}">${v}</option>`)
-            .join("");
-    } else logDebug("No form. If this is seen before the Refresh Fonts button has been pressed, you can safely ignore this message.");
-
-    logDebug("Font choices refreshed:", newChoices);
 }
 
 /**
