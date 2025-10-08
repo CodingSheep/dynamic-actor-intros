@@ -16,7 +16,7 @@ Dynamic Actor Intros expands on Yakuza-fy with the following features:
 3) Fill in the form with any details you'd like. Test your settings or save them to a Macro.
 4) Your Dynamic Intro is now saved to your Macro Directory. You can now use it like any Macro in Foundry!
    
-<video src="https://github.com/CodingSheep/dynamic-actor-intros/blob/main/_doc/Dynamic%20Actor%20Intros%20Tutorial.mp4"></video>
+https://github.com/user-attachments/assets/44ca19a0-12d5-4e5e-853f-ca79d2b7d0a7
 
 ## Requirements
 - Foundry V12
