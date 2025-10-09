@@ -17,8 +17,6 @@ Hooks.once("init", () => {
     // Set up context menu hooks early
     setupActorContextMenu();
     logInfo("Actor Context Menu Added.");
-
-    // I'm keeping this here for the purpose of eventually adding this option to an existing token on the field.
     setupTokenContextMenu();
     logInfo("Token Context Menu Added.");
 });
@@ -41,16 +39,16 @@ Hooks.once("ready", () => {
 });
 
 /**
- * Handle showing an intro (socket handler)
+ * Hook to ensure you can create an intro using the Actor Context Menu
  */
 function setupActorContextMenu() {
     logDebug("Setting up context menu for actors");
 
     Hooks.on("getActorDirectoryEntryContext", (html, options) => {
-        if (!game.user.isGM) return; // Only GMs can trigger intros
+        if (!game.user.isGM) return;
 
         options.push({
-            name: "Dynamic Actor Intro", // You can localize later if you wish
+            name: "Dynamic Actor Intro",
             icon: '<i class="fas fa-bomb"></i>',
             condition: li => !!li.data("documentId"),
             callback: li => {
@@ -73,17 +71,20 @@ function setupActorContextMenu() {
     });
 }
 
+/**
+ * Hook to ensure you can create an intro using the Token Controls Menu
+ */
 function setupTokenContextMenu() {
     logDebug("Setting up context menu for tokens.");
 
     Hooks.on("getSceneControlButtons", controls => {
-        if (!game.user.isGM) return; // Only GMs can trigger intros
+        if (!game.user.isGM) return;
 
-	const tokenControls = controls.find(c => c.name === "token");
-	if (!tokenControls) return;
+        const tokenControls = controls.find(c => c.name === "token");
+        if (!tokenControls) return;
 
         tokenControls.tools.push({
-	    name: "dynamicActorIntro",
+            name: "dynamicActorIntro",
             title: "Dynamic Actor Intro",
             icon: "fas fa-bomb",
             button: true,
@@ -94,18 +95,17 @@ function setupTokenContextMenu() {
                     return ui.notifications.warn("Select a token first.");
                 }
 
-		if (window.DynamicActorIntros?.triggerActorIntro) {
+                if (window.DynamicActorIntros?.triggerActorIntro) {
                     window.DynamicActorIntros.triggerActorIntro(selected.actor);
                 } else {
                     logError("DynamicActorIntros API not available");
                     ui.notifications.error("Dynamic Actor Intros API not available.");
                 }
             },
-	    visible: true
+            visible: true
         });
     });
 }
-
 
 /**
  * Initialize the module after ready hook has fired

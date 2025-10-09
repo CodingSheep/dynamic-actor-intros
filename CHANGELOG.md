@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.4 - 2025-10-08
+- Code Refactoring and cleaning up weird spacing from file transfer. Should have been handled as part of 1.0.3.
+
 ## 1.0.3 - 2025-10-08
 - The official creation of the Changelog.
 - Added a Button to Token Controls to create a Dynamic Intro for a selected token

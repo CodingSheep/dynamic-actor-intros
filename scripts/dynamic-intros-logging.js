@@ -1,5 +1,5 @@
 /**
- * Dynamic Actor intros Logging Module
+ * Dynamic Actor Intros Logging Module
  * Handles all logging functionality with different verbosity levels
  */
 

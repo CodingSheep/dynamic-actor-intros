@@ -54,18 +54,18 @@ export async function init() {
     };
     logDebug("Core module initialization complete");
 
-    // Inject Fonts
+    // Detect & Inject Fonts
     await getAvailableFonts();
 
     // Create Macro Directory Folder if it does not already exist.
     let folder = game.folders.getName(MACRO_DIRECTORY);
     if (!folder) {
-	folder = await Folder.create({
-	    name: MACRO_DIRECTORY,
-	    type: "Macro",
-	    parent: null
-	});
-	logInfo(`Created new macro folder: "${MACRO_DIRECTORY}"`);
+        folder = await Folder.create({
+            name: MACRO_DIRECTORY,
+            type: "Macro",
+            parent: null
+        });
+        logInfo(`Created new macro folder: "${MACRO_DIRECTORY}"`);
     } else logInfo(`Macro folder "${MACRO_DIRECTORY}" already exists.`);
     game.dynamicActorIntrosMacroFolder = folder.id;
 
@@ -120,23 +120,24 @@ export async function triggerActorIntro(actor) {
             const existingData = JSON.parse(match[1].replace(/([a-zA-Z0-9]+)\s*:/g, '"$1":'));
 
             // JSON-parseable format
-	    Object.assign(actorData, {
-		title: existingData.title,
-		subtitle1: existingData.subtitle1,
-		subtitle2: existingData.subtitle2,
-		font: existingData.font,
-		textColor: existingData.textColor,
-		textShadow: existingData.textShadow
-	    });
+            Object.assign(actorData, {
+                title: existingData.title,
+                subtitle1: existingData.subtitle1,
+                subtitle2: existingData.subtitle2,
+                font: existingData.font,
+                textColor: existingData.textColor,
+                textShadow: existingData.textShadow
+            });
         }
     }
 
+    // Default Form Format
     const getDialogContent = () => {
-	const fontOptions = AVAILABLE_FONTS.map(f =>
-	    `<option value="${f.name}" style="font-family: '${f.name}', sans-serif;" ${f.name === actorData.font ? "selected" : ""}>${f.name}</option>`
-	).join("");
+        const fontOptions = AVAILABLE_FONTS.map(f =>
+            `<option value="${f.name}" style="font-family: '${f.name}', sans-serif;" ${f.name === actorData.font ? "selected" : ""}>${f.name}</option>`
+        ).join("");
 
-	return `
+        return `
             <form>
                 <div class="form-group">
                     <label>Title</label>
@@ -176,16 +177,16 @@ export async function triggerActorIntro(actor) {
             save: {
                 icon: '<i class="fas fa-check"></i>',
                 label: "Save as Macro",
-                callback: html => {
+                callback: async html => {
                     // Collect the inputs
                     Object.assign(actorData, {
-			title: html.find('[name="title"]').val(),
-			subtitle1: html.find('[name="subtitle1"]').val(),
-			subtitle2: html.find('[name="subtitle2"]').val(),
-			font: html.find('[name="font"]').val(),
-			textColor: html.find('[name="textColor"]').val(),
-			textShadow: html.find('[name="textShadow"]').val(),
-		    });
+                        title: html.find('[name="title"]').val(),
+                        subtitle1: html.find('[name="subtitle1"]').val(),
+                        subtitle2: html.find('[name="subtitle2"]').val(),
+                        font: html.find('[name="font"]').val(),
+                        textColor: html.find('[name="textColor"]').val(),
+                        textShadow: html.find('[name="textShadow"]').val(),
+                    });
 
                     // Build the Macro Command String
                     const macroCommand = `
@@ -193,19 +194,20 @@ export async function triggerActorIntro(actor) {
                     window.DynamicActorIntros.socket.executeForEveryone("showDynamicIntro", actorData);
                     `;
 
-		    // Generate Macro Name. Also get Macro Folder ID
+                    // Generate Macro Name. Also get Macro Folder ID
                     const macroName = `Dynamic Intro: ${actorData.name}`;
                     let macroFolder = game.folders.find(f => f.name === MACRO_DIRECTORY && f.type === "Macro");
 
-                    // Check of macro already exists
+                    // Check of macro already exists. If so, Update. Otherwise, Create.
                     const existingMacro = game.macros.find(m => m.name === macroName);
 
                     if (existingMacro) {
                         // Update the macro command
-                        existingMacro.update({
-			    command: macroCommand,
-			    folder: macroFolder?.id || existingMacro.folder?.id
-			}).then(() => logDebug(`Macro "${macroName}" updated.`));
+                        await existingMacro.update({
+                            command: macroCommand,
+                            folder: macroFolder?.id || existingMacro.folder?.id
+                        });
+                        logDebug(`Macro "${macroName}" updated.`);
                         ui.notifications.info(`Macro "${macroName}" updated and stored in your Macro Directory!`);
                     } else {
                         // Create a new macro
@@ -215,9 +217,10 @@ export async function triggerActorIntro(actor) {
                             scope: "global",
                             command: macroCommand,
                             img: actorData.img || "icons/svg/dice-target.svg",
-			    folder: macroFolder?.id
+                            folder: macroFolder?.id
                         };
-                        Macro.create(macroData, { displaySheet: true }).then(() => logInfo("Macro Created."));
+                        Macro.create(macroData, { displaySheet: true });
+                        logDebug("Macro Created.");
                         ui.notifications.info(`Macro "${macroName}" created and stored in your Macro Directory!`);
                     }
                 }
@@ -225,24 +228,28 @@ export async function triggerActorIntro(actor) {
             test: {
                 icon: '<i class="fas fa-eye"></i>',
                 label: "Test Intro",
-                callback: html => {
+                callback: async html => {
                     // Collect the inputs
-		    Object.assign(actorData, {
-			title: html.find('[name="title"]').val(),
-			subtitle1: html.find('[name="subtitle1"]').val(),
-			subtitle2: html.find('[name="subtitle2"]').val(),
-			font: html.find('[name="font"]').val(),
-			textColor: html.find('[name="textColor"]').val(),
-			textShadow: html.find('[name="textShadow"]').val(),
-		    });
+                    Object.assign(actorData, {
+                        title: html.find('[name="title"]').val(),
+                        subtitle1: html.find('[name="subtitle1"]').val(),
+                        subtitle2: html.find('[name="subtitle2"]').val(),
+                        font: html.find('[name="font"]').val(),
+                        textColor: html.find('[name="textColor"]').val(),
+                        textShadow: html.find('[name="textShadow"]').val(),
+                    });
 
                     // Broadcast to just the GM client.
-                    showDynamicIntro(actorData)
-                        .then(() => { logInfo("Intro triggered for GM user") })
-                        .catch(err => logWarning(err));
+                    try {
+                        await showDynamicIntro(actorData);
+                    } catch (err) {
+                        logWarning(err);
+                    }
+
+                    logInfo("Intro triggered for GM user");
 
                     // Re-render the dialog box
-		    introBox.data.content = getDialogContent();
+                    introBox.data.content = getDialogContent();
                     introBox.render(true);
                 }
             },

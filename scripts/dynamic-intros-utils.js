@@ -52,7 +52,7 @@ export async function getAvailableFonts() {
 /**
  * Handle font injection
  */
-export async function injectFonts() {
+async function injectFonts() {
     if (!AVAILABLE_FONTS.length) await getAvailableFonts();
 
     for (const f of AVAILABLE_FONTS) {
@@ -67,7 +67,7 @@ export async function injectFonts() {
 /**
  * This function handles refreshing all Font Choices when a new font is added/removed from the fonts folder
  */
-export function refreshDefaultFontChoices() {
+function refreshDefaultFontChoices() {
     const setting = game.settings.settings.get(`${DAI_ID}.defaultFontFamily`);
     if (!setting) {
         logInfo("Setting does not exist");

@@ -17,7 +17,6 @@ import { DAI_ID } from './dynamic-intros-utils.js';
  * @returns {string} HTML string for the text elements
  */
 function buildTextElements(title, font, subtitle1 = null, subtitle2 = null, textColor = "#ad0a0a", textShadow = "#ffffff") {
-
     const shadow = `2px 2px 0 ${textShadow},
 		    -2px -2px 0 ${textShadow},
 		    2px -2px 0 ${textShadow},
@@ -73,6 +72,7 @@ async function animateElements() {
 export async function showDynamicIntro(introData) {
     logDebug("Showing dynamic intro with data:", introData);
     $("#dynamic-intro-overlay").remove();
+    
     // Create overlay DOM structure
     logDebug("Creating overlay DOM structure");
     const overlay = $(`

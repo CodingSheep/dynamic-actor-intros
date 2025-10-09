@@ -29,8 +29,8 @@ export function registerFadeOutTimer() {
     game.settings.register(DAI_ID, "fadeOutSeconds", {
         name: "Fade-out Duration",
         hint: "The number of seconds the Dynamic Intro remains visible before automatically fading out.",
-        scope: "world",      // "world" so all users use the same setting
-        config: true,        // Show in the module settings tab
+        scope: "world",
+        config: true,
         type: Number,
         default: 5,
         range: {
@@ -44,6 +44,9 @@ export function registerFadeOutTimer() {
     });
 }
 
+/**
+ * Register the User-specified font directory
+ */
 export function registerUserFontDir() {
     game.settings.register(DAI_ID, "userFontDir", {
         name: "User Font Folder",
@@ -52,9 +55,9 @@ export function registerUserFontDir() {
         config: true,
         type: String,
         default: "",
-	filePicker: "folder",
+        filePicker: "folder",
         onChange: async value => {
-	    logDebug(`User Font Folder updated to: ${value}`);
+            logDebug(`User Font Folder updated to: ${value}`);
             await getAvailableFonts();
         }
     });
@@ -73,8 +76,8 @@ export function registerDefaultFontFamily() {
     game.settings.register(DAI_ID, "defaultFontFamily", {
         name: "Default Font",
         hint: "Sets the default font family for Dynamic Intros.",
-        scope: "world",      // "world" so all users use the same setting
-        config: true,        // Show in the module settings tab
+        scope: "world",
+        config: true,
         type: String,
         default: AVAILABLE_FONTS[0]?.name,
         onChange: value => {
@@ -91,8 +94,8 @@ export function registerDefaultTextColor() {
     game.settings.register(DAI_ID, "defaultTextColor", {
         name: "Default Text Color",
         hint: "The default color used for intro text when no color is chosen. (Hex format)",
-        scope: "world",      // "world" so all users use the same setting
-        config: true,        // Show in the module settings tab
+        scope: "world",
+        config: true,
         type: String,
         default: "#ad0a0a",
         onChange: value => {
@@ -109,8 +112,8 @@ export function registerDefaultShadowColor() {
     game.settings.register(DAI_ID, "defaultShadowColor", {
         name: "Default Text Shadow Color",
         hint: "The default color used for intro text shadows when no color is chosen. (Hex format)",
-        scope: "world",      // "world" so all users use the same setting
-        config: true,        // Show in the module settings tab
+        scope: "world",
+        config: true,
         type: String,
         default: "#ffffff",
         onChange: value => {
