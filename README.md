@@ -19,7 +19,7 @@ Dynamic Actor Intros expands on Yakuza-fy with the following features:
 https://github.com/user-attachments/assets/44ca19a0-12d5-4e5e-853f-ca79d2b7d0a7
 
 ## Requirements
-- Foundry V12
+- Foundry V13
 - SocketLib
 
 ## Installation
