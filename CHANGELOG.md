@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5 - 2025-10-15
+- Updated the module for V13. Note, this forces the module to only work on V13. It no longer works on V12.
+
 ## 1.0.4 - 2025-10-08
 - Code Refactoring and cleaning up weird spacing from file transfer. Should have been handled as part of 1.0.3.
 

@@ -44,15 +44,15 @@ Hooks.once("ready", () => {
 function setupActorContextMenu() {
     logDebug("Setting up context menu for actors");
 
-    Hooks.on("getActorDirectoryEntryContext", (html, options) => {
+    Hooks.on("getActorContextOptions", (app, menuItems) => {
         if (!game.user.isGM) return;
 
-        options.push({
+        menuItems.push({
             name: "Dynamic Actor Intro",
             icon: '<i class="fas fa-bomb"></i>',
-            condition: li => !!li.data("documentId"),
+            condition: li => !!li.dataset.entryId,
             callback: li => {
-                const id = li.data("documentId");
+                const id = li.dataset.entryId;
                 const actor = game.actors.get(id);
 
                 if (!actor) {
@@ -80,30 +80,33 @@ function setupTokenContextMenu() {
     Hooks.on("getSceneControlButtons", controls => {
         if (!game.user.isGM) return;
 
-        const tokenControls = controls.find(c => c.name === "token");
-        if (!tokenControls) return;
+        if (!controls.tokens) return;
 
-        tokenControls.tools.push({
-            name: "dynamicActorIntro",
-            title: "Dynamic Actor Intro",
-            icon: "fas fa-bomb",
-            button: true,
-            onClick: () => {
-                const selected = canvas.tokens.controlled[0];
+        const tokenTools = controls.tokens.tools;
 
-                if (!selected || !selected.actor) {
-                    return ui.notifications.warn("Select a token first.");
+        if (!tokenTools.dynamicActorIntro) {
+            tokenTools.dynamicActorIntro = {
+                name: "dynamicActorIntro",
+                title: "Dynamic Actor Intro",
+                icon: "fas fa-bomb",
+                button: true,
+                visible: true,
+                onClick: () => {
+                    const selected = canvas.tokens.controlled[0];
+
+                    if (!selected || !selected.actor) {
+                        return ui.notifications.warn("Select a token first.");
+                    }
+
+                    if (window.DynamicActorIntros?.triggerActorIntro) {
+                        window.DynamicActorIntros.triggerActorIntro(selected.actor);
+                    } else {
+                        logError("DynamicActorIntros API not available");
+                        ui.notifications.error("Dynamic Actor Intros API not available.");
+                    }
                 }
-
-                if (window.DynamicActorIntros?.triggerActorIntro) {
-                    window.DynamicActorIntros.triggerActorIntro(selected.actor);
-                } else {
-                    logError("DynamicActorIntros API not available");
-                    ui.notifications.error("Dynamic Actor Intros API not available.");
-                }
-            },
-            visible: true
-        });
+            };
+        }
     });
 }
 
